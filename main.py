@@ -36,7 +36,7 @@ def simulation (coding, packet_length, num_of_retransmission, signal_length, noi
     signal = generator.generate_signal(signal_length)
     received_signal = []
 
-    packets = generator.generate_package(signal, coding, 1)
+    packets = generator.generate_package(signal, coding, 2)
     transmission_canal = TransmissionCanal(bandwith)
     iter = 0
 
@@ -95,11 +95,11 @@ if __name__ == '__main__':
     # Liczba możliwych retransmisji
     num_of_retransmission = 5
     # Długość sygnału
-    signal_lenth = 100
+    signal_lenth = 1000
     # Szum w kanale - % na zakłócenie pojedynczej paczki np 0.2 = 20%
-    noise = 0.2
+    noise = 0.01
     # Szerokość pasma w Mb
-    bandwith = 1000
+    bandwith = 2.4
     # Liczba powtórzeń symulacji
     num_of_repetition = 100
 

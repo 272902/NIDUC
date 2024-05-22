@@ -1,3 +1,5 @@
+import bchlib
+
 class CorrectionCoding:
     def hamming_encode(self, data):
 
@@ -26,3 +28,25 @@ class CorrectionCoding:
             encoded_data[parity_index] = parity_value
 
         return encoded_data
+
+    def bch_encode(self, data):
+        BCH_POLYNOMIAL = 8219
+        BCH_BITS = 8
+        bch = bchlib.BCH(BCH_POLYNOMIAL, BCH_BITS)
+        data_bytes = bytes(data)
+        ecc = bch.encode(data_bytes)
+        packet = data_bytes + ecc
+        return list(packet)
+
+    def bch_decode(self, data):
+        BCH_POLYNOMIAL = 8219
+        BCH_BITS = 8
+        bch = bchlib.BCH(BCH_POLYNOMIAL, BCH_BITS)
+        data_bytes = bytes(data)
+        data, ecc = data_bytes[:-bch.ecc_bytes], data_bytes[-bch.ecc_bytes:]
+        decoded_data, status = bch.decode(data, ecc)
+        if status == 0:
+            return list(decoded_data)
+        else:
+            # If the decoding failed, return None or handle the error appropriately
+            return None

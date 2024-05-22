@@ -1,3 +1,5 @@
+import bchlib
+
 from DetectionCoding import DetectionCoding
 from CorrectionCoding import CorrectionCoding
 
@@ -69,3 +71,8 @@ class Decoder:
                 decoded_data.append(encode_data[i - 1])
 
         return decoded_data
+
+    def bch_decode(self, encode_data):
+        correctionCoding = CorrectionCoding()
+        decoded_data = correctionCoding.bch_decode(encode_data)
+        return decoded_data if decoded_data is not None else encode_data

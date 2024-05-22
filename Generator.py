@@ -60,5 +60,10 @@ class Generator:
             for i, packet in enumerate(packages):
                 packages[i] = correctionCoding.hamming_encode(packet)
 
+        # Kodowanie BCH
+        if type == 2:
+            for i, packet in enumerate(packages):
+                packages[i] = correctionCoding.bch_encode(packet)
+
         # Zwraca paczkę z pakietami
         return packages
