@@ -1,4 +1,5 @@
 import bchlib
+import random
 
 class CorrectionCoding:
     def hamming_encode(self, data):
@@ -30,23 +31,57 @@ class CorrectionCoding:
         return encoded_data
 
     def bch_encode(self, data):
-        BCH_POLYNOMIAL = 8219
-        BCH_BITS = 8
-        bch = bchlib.BCH(BCH_POLYNOMIAL, BCH_BITS)
+        t = 8  # Error correction capability
+        poly = 8219  # Example polynomial, replace with a valid one if necessary
+        m = 13  # Galois field size, replace with a valid one if necessary
+        swap_bits = False
+        try:
+            bch = bchlib.BCH(t, poly, m, swap_bits)
+        except RuntimeError as e:
+            print(f"Error initializing BCH: {e}")
+            return None
+
         data_bytes = bytes(data)
         ecc = bch.encode(data_bytes)
         packet = data_bytes + ecc
         return list(packet)
 
     def bch_decode(self, data):
-        BCH_POLYNOMIAL = 8219
-        BCH_BITS = 8
-        bch = bchlib.BCH(BCH_POLYNOMIAL, BCH_BITS)
+        t = 8  # Error correction capability
+        poly = 8219  # Example polynomial, replace with a valid one if necessary
+        m = 13  # Galois field size, replace with a valid one if necessary
+        swap_bits = False
+        try:
+            bch = bchlib.BCH(t, poly, m, swap_bits)
+        except RuntimeError as e:
+            print(f"Error initializing BCH: {e}")
+            return None
+
         data_bytes = bytes(data)
         data, ecc = data_bytes[:-bch.ecc_bytes], data_bytes[-bch.ecc_bytes:]
-        decoded_data, status = bch.decode(data, ecc)
+
+        status = bch.decode(data, ecc)
         if status == 0:
-            return list(decoded_data)
+            print(f"BCH Decode Success - Decoded Data: {data}")
+            return list(data)
         else:
-            # If the decoding failed, return None or handle the error appropriately
+            print(f"BCH Decode Failure - Status: {status}")
             return None
+
+    def repeat_encode(self, data, repeat_factor):
+        """ Kodowanie danych poprzez powtarzanie """
+        encoded_data = []
+        for bit in data:
+            encoded_data.extend([bit] * repeat_factor)
+        return encoded_data
+
+    def repeat_decode(self, data, repeat_factor):
+        """ Dekodowanie danych zakodowanych za pomocą powtarzania """
+        decoded_data = []
+        for i in range(0, len(data), repeat_factor):
+            chunk = data[i:i + repeat_factor]
+            # Ustalamy wartość na podstawie większości powtórzeń
+            decoded_bit = max(set(chunk), key=chunk.count)
+            decoded_data.append(decoded_bit)
+        return decoded_data
+

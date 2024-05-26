@@ -65,5 +65,9 @@ class Generator:
             for i, packet in enumerate(packages):
                 packages[i] = correctionCoding.bch_encode(packet)
 
+        if type == 3:  # Kodowanie konwolucyjne
+            for i, package in enumerate(packages):
+                packages[i] = correctionCoding.repeat_encode(packet,3)
+
         # Zwraca paczkę z pakietami
         return packages

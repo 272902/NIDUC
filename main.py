@@ -36,7 +36,7 @@ def simulation (coding, packet_length, num_of_retransmission, signal_length, noi
     signal = generator.generate_signal(signal_length)
     received_signal = []
 
-    packets = generator.generate_package(signal, coding, 2)
+    packets = generator.generate_package(signal, coding, 1)
     transmission_canal = TransmissionCanal(bandwith)
     iter = 0
 
