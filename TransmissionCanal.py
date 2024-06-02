@@ -30,3 +30,4 @@ class TransmissionCanal:
             return True
         else:
             return False
+
