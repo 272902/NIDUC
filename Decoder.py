@@ -18,16 +18,19 @@ class Decoder:
 
         # CRC-8
         if choose_coding == 1:
+            print("coding: 1")
             if package[-8:] == detectionCoding.crc_8(package[0:-8]):
                 return True
             return False
         # CRC-16
         if choose_coding == 2:
+            print("coding: 2")
             if package[-16:] == detectionCoding.crc_16(package[0:-16]):
                 return True
             return False
         # CRC-32
         if choose_coding == 3:
+            print("coding: 3")
             if package[-32:] == detectionCoding.crc_32(package[0:-32]):
                 return True
             return False
@@ -72,7 +75,37 @@ class Decoder:
 
         return decoded_data
 
-    def bch_decode(self, encode_data):
-        correctionCoding = CorrectionCoding()
-        decoded_data = correctionCoding.bch_decode(encode_data)
-        return decoded_data if decoded_data is not None else encode_data
+    def bch_decode(self, data):
+        t = 8  # Error correction capability
+        poly = 8219  # Example polynomial, replace with a valid one if necessary
+        m = 13  # Galois field size, replace with a valid one if necessary
+        swap_bits = False
+        try:
+            bch = bchlib.BCH(t, poly, m, swap_bits)
+        except RuntimeError as e:
+            print(f"Error initializing BCH: {e}")
+            return None
+
+        data_bytes = bytes(data)
+        data, ecc = data_bytes[:-bch.ecc_bytes], data_bytes[-bch.ecc_bytes:]
+
+        status = bch.decode(data, ecc)
+        if status == 0:
+            print(f"BCH Decode Success - Decoded Data: {data}")
+            return list(data)
+        else:
+            print(f"BCH Decode Failure - Status: {status}")
+            return None
+
+
+
+
+    def repeat_decode(self, data, repeat_factor):
+        """ Dekodowanie danych zakodowanych za pomocą powtarzania """
+        decoded_data = []
+        for i in range(0, len(data), repeat_factor):
+            chunk = data[i:i + repeat_factor]
+            # Ustalamy wartość na podstawie większości powtórzeń
+            decoded_bit = 1 if sum(chunk) > (repeat_factor // 2) else 0
+            decoded_data.append(decoded_bit)
+        return decoded_data
