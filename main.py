@@ -39,7 +39,7 @@ def simulation (coding, packet_length, num_of_retransmission, signal_length, noi
     signal = generator.generate_signal(signal_length)
     received_signal = []
 
-    packets = generator.generate_package(signal, coding, type)
+    packets, rem_packets = generator.generate_package(signal, coding, type)
     transmission_canal = TransmissionCanal(bandwith)
     iter = 0
 
@@ -47,7 +47,7 @@ def simulation (coding, packet_length, num_of_retransmission, signal_length, noi
         r1 = (random.randint(1, 5) / 34)
         r2 = (random.randint(1, 3) / 345)
         duration = r1 * r2 * len(packet) / bandwith
-        event = Event(packet, current_time, duration)
+        event = Event(packet, rem_packets[iter], current_time, duration)
         iter += 1
 
         event_id = iter
@@ -69,7 +69,7 @@ def simulation (coding, packet_length, num_of_retransmission, signal_length, noi
                 packet2 = decoder.repeat_decode(packet2, bits_repetition_numb)
 
             # VVVVV -- printowanie packetow -- VVVVV [dlugosc packetow, jak dostac sie do packetu z sygnalu wejsciowego]
-            print(packet,packet2)
+            #print(packet,packet2)
 
             def draw_packet(x, y, status):
                 color = "green" if status == "accepted" else "red" if status == "corrupted" else "blue"
@@ -78,8 +78,10 @@ def simulation (coding, packet_length, num_of_retransmission, signal_length, noi
             x = int(event.start_time * 100)
             y = event.retranmission * 20 + 50
             #VVVVV -- jesli paczka w sygnale wejsciowym jest taka sama jak w sygnale wyjsciowym to "accepted" -- VVVVV
-            status = "accepted" if packet2[0:packet_length] == event.packet[3:packet_length+3] else "corrupted"
+            status = "accepted" if event.packet_before[0:packet_length] == decoder.remove_coding_bits(packet2, coding) else "corrupted"
             draw_packet(x, y, status)
+
+            #print(event.packet_before[0:packet_length],decoder.remove_coding_bits(packet2, coding))
 
             #Dekodowanie kodów detekcyjnych
             if decoder.receive_package(packet2, coding):
@@ -96,6 +98,8 @@ def simulation (coding, packet_length, num_of_retransmission, signal_length, noi
                     received_signal += decoder.remove_coding_bits(packet2, coding)
                     time.append([packet2, transmission_canal.not_free_to])
                     continue
+
+
         event.start_time += delta_time
         events_queue.put(event)
     root.mainloop()
@@ -110,11 +114,11 @@ if __name__ == '__main__':
     # Powtorzenia bitów
     bits_repetition_numb = 3
     # Długość pakietu
-    packet_length = 10
+    packet_length = 5
     # Liczba możliwych retransmisji
-    num_of_retransmission = 0
+    num_of_retransmission = 4
     # Długość sygnału
-    signal_lenth = 10
+    signal_lenth = 20
     # Szum w kanale - % na zakłócenie pojedynczej paczki np 0.2 = 20%
     noise = 0.01
     # Szerokość pasma w Mb

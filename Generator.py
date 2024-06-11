@@ -38,6 +38,7 @@ class Generator:
         detectionCoding = DetectionCoding()
         correctionCoding = CorrectionCoding()
         packages = self.split_signal_into_packages(signal)
+        packet_rem=packages.copy()
         """ Bit parzystości """
         # Kodowanie bitu parzystości
         if choose_coding == 0:
@@ -73,4 +74,4 @@ class Generator:
                 packages[i] = correctionCoding.repeat_encode(packet, 3)
 
         # Zwraca paczkę z pakietami
-        return packages
+        return packages,packet_rem
